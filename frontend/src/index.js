@@ -80,7 +80,8 @@ export async function InitiateMeeting(mode) {
     } else if (mode === "create") {
         console.log("Creating a meeting...");
         try {
-            const response = await fetch("http://localhost:8080/create-room");        
+            const response = await fetch("https://riverside-6wtg.onrender.com/create-room");
+        
             const data = await response.json();
             room_id = data.roomID;
             if (!room_id) {
@@ -106,7 +107,8 @@ export async function InitiateMeeting(mode) {
 
     try {
         console.log(`Attempting to connect to WebSocket with roomID: ${room_id}`);
-        let socket = new WebSocket(`wss://localhost:8080/join-room?roomID=${room_id}`);
+        let socket = new WebSocket(`wss://riverside-6wtg.onrender.com/join-room?roomID=${room_id}`);
+
         websocket = socket;
 
         socket.addEventListener("open", () => {
