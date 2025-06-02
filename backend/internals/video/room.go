@@ -21,26 +21,22 @@ type RoomMap struct {
 	Map   map[string][]Participant
 }
 
-// initialize the room map
 func (r *RoomMap) Init() {
 	r.Map = make(map[string][]Participant)
 }
 
-// get all participants in the room
 func (r *RoomMap) Get(roomID string) []Participant {
-
 	r.Mutex.RLock()
 	defer r.Mutex.RUnlock()
 	return r.Map[roomID]
 }
 
-// create the room
 func (r *RoomMap) CreateRoom() string {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
 
 	rgen := rand.New(rand.NewSource(time.Now().UnixNano()))
-	var letters = []rune("cghwdjvbuhg3d287t93oeihodbjwkjbx2HJKBCEIkjg6")
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 	b := make([]rune, 8)
 
 	for i := range b {
@@ -53,18 +49,40 @@ func (r *RoomMap) CreateRoom() string {
 	return roomID
 }
 
-// join a room handler
 func (r *RoomMap) InsertInRoom(roomID string, host bool, conn *websocket.Conn) {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
 
 	clientID := uuid.New().String()
-	NewParticipant := Participant{host, clientID, conn, sync.Mutex{}}
+	newParticipant := Participant{Host: host, ID: clientID, Conn: conn, Mutex: sync.Mutex{}}
 
-	r.Map[roomID] = append(r.Map[roomID], NewParticipant)
+	r.Map[roomID] = append(r.Map[roomID], newParticipant)
 }
 
-// delete a room
+// Remove a client from a room safely
+func (r *RoomMap) RemoveClient(roomID string, conn *websocket.Conn) {
+	r.Mutex.Lock()
+	defer r.Mutex.Unlock()
+
+	participants, ok := r.Map[roomID]
+	if !ok {
+		return
+	}
+
+	for i, participant := range participants {
+		if participant.Conn == conn {
+			// Remove participant from slice
+			r.Map[roomID] = append(participants[:i], participants[i+1:]...)
+			break
+		}
+	}
+
+	// If room empty after removal, delete the room
+	if len(r.Map[roomID]) == 0 {
+		delete(r.Map, roomID)
+	}
+}
+
 func (r *RoomMap) DeleteRoom(roomID string) {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
