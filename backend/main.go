@@ -70,16 +70,14 @@ func main() {
 	setupRoutes(app)
 
 	// Get port from environment or use default
-	port := os.Getenv("APP_PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
-		port = ":8080"
-	} else if port[0] != ':' {
-		port = ":" + port
+		port = "8080"
 	}
 
-	// Start server
 	log.Printf("Server starting on port %s", port)
-	if err := app.Listen(port); err != nil {
+	if err := app.Listen(":" + port); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
+
 }
