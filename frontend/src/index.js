@@ -106,7 +106,7 @@ export async function InitiateMeeting(mode) {
 
     try {
         console.log(`Attempting to connect to WebSocket with roomID: ${room_id}`);
-        let socket = new WebSocket(`ws://localhost:8080/join-room?roomID=${room_id}`);
+        let socket = new WebSocket(`wss://localhost:8080/join-room?roomID=${room_id}`);
         websocket = socket;
 
         socket.addEventListener("open", () => {
@@ -268,7 +268,7 @@ function ConnectToWebSocket() {
         return false;
     }
 
-    const connection = new WebSocket(`ws://${document.location.host}/ws`);
+    const connection = new WebSocket(`wss://${document.location.host}/wss`);
 
     connection.onopen = () => console.log("websocket connected");
     connection.onerror = (err) => console.error("websocket error", err);

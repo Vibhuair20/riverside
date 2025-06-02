@@ -39,10 +39,7 @@ func setupRoutes(app *fiber.App) {
 	}))
 
 	// Serve static files
-	app.Static("/", "./frontend/dist")
-	app.Get("/*", func(c *fiber.Ctx) error {
-		return c.SendFile("./frontend/dist/index.html")
-	})
+
 }
 
 func main() {
