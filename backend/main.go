@@ -38,13 +38,7 @@ func setupRoutes(app *fiber.App) {
 		Origins: []string{"*"},
 	}))
 
-	// Serve frontend static files from the build directory
-	app.Static("/", "./frontend/dist")
-
-	// SPA fallback: serve index.html on all other routes
-	app.Get("/*", func(c *fiber.Ctx) error {
-		return c.SendFile("./frontend/dist/index.html")
-	})
+	// Serve static files
 
 }
 
