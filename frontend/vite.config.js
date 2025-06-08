@@ -3,8 +3,6 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  base: '/riverside/',  // <-- add this line
-
   plugins: [tailwindcss(), react()],
   build: {
     outDir: 'dist',

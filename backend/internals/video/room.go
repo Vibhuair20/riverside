@@ -10,10 +10,11 @@ import (
 )
 
 type Participant struct {
-	Host  bool
-	ID    string
-	Conn  *websocket.Conn
-	Mutex sync.Mutex
+	Host   bool
+	ID     string
+	UserId string
+	Conn   *websocket.Conn
+	Mutex  sync.Mutex
 }
 
 type RoomMap struct {
@@ -49,14 +50,22 @@ func (r *RoomMap) CreateRoom() string {
 	return roomID
 }
 
-func (r *RoomMap) InsertInRoom(roomID string, host bool, conn *websocket.Conn) {
+func (r *RoomMap) InsertInRoom(roomID string, host bool, userID string, conn *websocket.Conn) string {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
 
 	clientID := uuid.New().String()
-	newParticipant := Participant{Host: host, ID: clientID, Conn: conn, Mutex: sync.Mutex{}}
+	newParticipant := Participant{
+		Host:   host,
+		ID:     clientID,
+		UserId: userID,
+		Conn:   conn,
+		Mutex:  sync.Mutex{},
+	}
 
 	r.Map[roomID] = append(r.Map[roomID], newParticipant)
+
+	return clientID
 }
 
 // Remove a client from a room safely
@@ -69,8 +78,13 @@ func (r *RoomMap) RemoveClient(roomID string, conn *websocket.Conn) {
 		return
 	}
 
+	var leavingParticipant Participant
 	for i, participant := range participants {
 		if participant.Conn == conn {
+			leavingParticipant = participant
+			if participant.Conn != nil {
+				participant.Conn.Close()
+			}
 			// Remove participant from slice
 			r.Map[roomID] = append(participants[:i], participants[i+1:]...)
 			break
@@ -80,6 +94,18 @@ func (r *RoomMap) RemoveClient(roomID string, conn *websocket.Conn) {
 	// If room empty after removal, delete the room
 	if len(r.Map[roomID]) == 0 {
 		delete(r.Map, roomID)
+	} else {
+		// Notify remaining participants about the leave
+		for _, participant := range r.Map[roomID] {
+			if participant.Conn != nil {
+				participant.Conn.WriteJSON(map[string]interface{}{
+					"type":    "leave",
+					"from":    leavingParticipant.UserId,
+					"to":      nil,
+					"payload": nil,
+				})
+			}
+		}
 	}
 }
 

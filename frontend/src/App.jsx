@@ -11,9 +11,11 @@ function App() {
   useEffect(() => {
     // Check if video elements exist
     const localVideo = document.getElementById('localClientVideo')
-    const remoteVideo = document.getElementById('remoteClientVideo')
+    const remoteVideo1 = document.getElementById('remoteClientVideo1')
+    const remoteVideo2 = document.getElementById('remoteClientVideo2')
+    const remoteVideo3 = document.getElementById('remoteCientVideo3')
     
-    if (!localVideo || !remoteVideo) {
+    if (!localVideo || !remoteVideo1 || !remoteVideo2 || !remoteVideo3) {
       setError('Video elements not found. Please refresh the page.')
     }
   }, [])
@@ -60,12 +62,32 @@ function App() {
           ></video>
         </div>
         <div className='flex flex-col items-center'>
-          <p className='text-white mb-2'>Remote Video</p>
+          <p className='text-white mb-2'>Remote Video 1</p>
           <video 
             autoPlay 
             playsInline
             controls 
-            id="remoteClientVideo" 
+            id="remoteClientVideo1" 
+            className='w-80 rounded-lg bg-gray-800'
+          ></video>
+        </div>
+        <div className='flex flex-col items-center'>
+          <p className='text-white mb-2'>Remote Video 2</p>
+          <video 
+            autoPlay 
+            playsInline
+            controls 
+            id="remoteClientVideo2" 
+            className='w-80 rounded-lg bg-gray-800'
+          ></video>
+        </div>
+        <div className='flex flex-col items-center'>
+          <p className='text-white mb-2'>Remote Video 3</p>
+          <video 
+            autoPlay 
+            playsInline
+            controls 
+            id="remoteClientVideo3" 
             className='w-80 rounded-lg bg-gray-800'
           ></video>
         </div>
